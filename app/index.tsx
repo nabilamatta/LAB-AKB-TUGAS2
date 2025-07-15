@@ -9,8 +9,7 @@ import {
   StyleSheet,
 } from 'react-native';
 
-// Kumpulan URL gambar utama dengan tema yang beragam
-const PRIMARY_IMAGES = [
+const GAMBAR_UTAMA = [
   'https://images.pexels.com/photos/1546166/pexels-photo-1546166.jpeg',
   'https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg',
   'https://images.pexels.com/photos/1029599/pexels-photo-1029599.jpeg',
@@ -23,8 +22,7 @@ const PRIMARY_IMAGES = [
   'https://images.pexels.com/photos/463935/pexels-photo-463935.jpeg',
 ];
 
-// Kumpulan URL gambar alternatif untuk transisi
-const SECONDARY_IMAGES = [
+const GAMBAR_ALTERNATIF = [
   'https://images.pexels.com/photos/221540/pexels-photo-221540.jpeg',
   'https://images.pexels.com/photos/415687/pexels-photo-415687.jpeg',
   'https://images.pexels.com/photos/164522/pexels-photo-164522.jpeg',
@@ -37,54 +35,42 @@ const SECONDARY_IMAGES = [
   'https://images.pexels.com/photos/326055/pexels-photo-326055.jpeg',
 ];
 
-// Menggabungkan data gambar dengan struktur yang lebih deskriptif
-const PHOTO_COLLECTION = PRIMARY_IMAGES.map((primaryUrl, index) => ({
-  identifier: `photo_${index + 1}`,
-  primarySource: primaryUrl,
-  alternativeSource: SECONDARY_IMAGES[index],
+const KUMPULAN_GAMBAR = GAMBAR_UTAMA.map((url, idx) => ({
+  id: idx + 1,
+  utama: url,
+  alternatif: GAMBAR_ALTERNATIF[idx],
 }));
 
-// Komponen untuk menampilkan kartu foto individual
-const PhotoCard = ({ photoData }) => {
-  const [isAlternativeMode, setIsAlternativeMode] = useState(false);
-  const [zoomLevel, setZoomLevel] = useState(1);
+const KartuGambar = ({ data }) => {
+  const [pakaiAlternatif, setPakaiAlternatif] = useState(false);
+  const [skala, setSkala] = useState(1);
 
-  const handlePhotoTap = () => {
-    setIsAlternativeMode(previousState => !previousState);
-    setZoomLevel(currentZoom => Math.min(currentZoom * 1.2, 2));
+  const saatDiklik = () => {
+    setPakaiAlternatif(prev => !prev);
+    setSkala(prev => Math.min(prev * 1.2, 2));
   };
 
   return (
-    <TouchableOpacity onPress={handlePhotoTap} style={styles.cardContainer}>
+    <TouchableOpacity onPress={saatDiklik} style={gaya.kotak}>
       <Image
-        source={{ 
-          uri: isAlternativeMode ? photoData.alternativeSource : photoData.primarySource 
-        }}
-        style={[styles.photoImage, { transform: [{ scale: zoomLevel }] }]}
+        source={{ uri: pakaiAlternatif ? data.alternatif : data.utama }}
+        style={[gaya.gambar, { transform: [{ scale: skala }] }]}
         resizeMode="cover"
       />
     </TouchableOpacity>
   );
 };
 
-// Komponen utama aplikasi galeri foto
-export default function PhotoGalleryGrid() {
-  const screenWidth = Dimensions.get('window').width;
-  const itemSize = (screenWidth / 3) - 12;
+export default function GridFoto() {
+  const ukuran = Dimensions.get('window').width / 3 - 12;
 
   return (
-    <SafeAreaView style={styles.mainContainer}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.gridLayout}>
-          {PHOTO_COLLECTION.map(photoItem => (
-            <View 
-              key={photoItem.identifier} 
-              style={[
-                styles.gridItem, 
-                { width: itemSize, height: itemSize }
-              ]}
-            >
-              <PhotoCard photoData={photoItem} />
+    <SafeAreaView style={gaya.latar}>
+      <ScrollView contentContainerStyle={gaya.konten}>
+        <View style={gaya.grid}>
+          {KUMPULAN_GAMBAR.map(item => (
+            <View key={item.id} style={[gaya.item, { width: ukuran, height: ukuran }]}>
+              <KartuGambar data={item} />
             </View>
           ))}
         </View>
@@ -93,31 +79,30 @@ export default function PhotoGalleryGrid() {
   );
 }
 
-// Definisi gaya dengan penamaan yang lebih deskriptif
-const styles = StyleSheet.create({
-  mainContainer: {
+const gaya = StyleSheet.create({
+  latar: {
     flex: 1,
     backgroundColor: '#1a1a1a',
   },
-  scrollContent: {
+  konten: {
     paddingVertical: 16,
     alignItems: 'center',
   },
-  gridLayout: {
+  grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
   },
-  gridItem: {
+  item: {
     margin: 6,
     borderRadius: 10,
     overflow: 'hidden',
     backgroundColor: '#2b2b2b',
   },
-  cardContainer: {
+  kotak: {
     flex: 1,
   },
-  photoImage: {
+  gambar: {
     width: '100%',
     height: '100%',
     borderRadius: 10,
