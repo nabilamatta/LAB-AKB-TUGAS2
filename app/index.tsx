@@ -19,7 +19,7 @@ const GAMBAR_UTAMA = [
   'https://images.pexels.com/photos/280222/pexels-photo-280222.jpeg',
   'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg',
   'https://images.pexels.com/photos/259588/pexels-photo-259588.jpeg',
-  'https://images.pexels.com/photos/463935/pexels-photo-463935.jpeg',
+  'https://images.pexels.com/photos/463935/pexels-photo-463935.jpeg', 
 ];
 
 const GAMBAR_ALTERNATIF = [
@@ -32,7 +32,7 @@ const GAMBAR_ALTERNATIF = [
   'https://images.pexels.com/photos/459225/pexels-photo-459225.jpeg',
   'https://images.pexels.com/photos/104827/cat-pet-animal-domestic-104827.jpeg',
   'https://images.pexels.com/photos/213399/pexels-photo-213399.jpeg',
-  'https://images.pexels.com/photos/326055/pexels-photo-326055.jpeg',
+  'https://images.pexels.com/photos/164522/pexels-photo-164522.jpeg', 
 ];
 
 const KUMPULAN_GAMBAR = GAMBAR_UTAMA.map((url, idx) => ({
@@ -41,7 +41,7 @@ const KUMPULAN_GAMBAR = GAMBAR_UTAMA.map((url, idx) => ({
   alternatif: GAMBAR_ALTERNATIF[idx],
 }));
 
-const KartuGambar = ({ data }) => {
+const KartuGambar = ({ data }: { data: typeof KUMPULAN_GAMBAR[0] }) => {
   const [pakaiAlternatif, setPakaiAlternatif] = useState(false);
   const [skala, setSkala] = useState(1);
 
