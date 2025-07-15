@@ -7,10 +7,10 @@ import {
   ScrollView,
   Dimensions,
   StyleSheet,
-  Text,
 } from 'react-native';
 
-const GAMBAR_UTAMA = [
+// Kumpulan URL gambar utama dengan tema yang beragam
+const PRIMARY_IMAGES = [
   'https://images.pexels.com/photos/1546166/pexels-photo-1546166.jpeg',
   'https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg',
   'https://images.pexels.com/photos/1029599/pexels-photo-1029599.jpeg',
@@ -23,7 +23,8 @@ const GAMBAR_UTAMA = [
   'https://images.pexels.com/photos/463935/pexels-photo-463935.jpeg',
 ];
 
-const GAMBAR_ALTERNATIF = [
+// Kumpulan URL gambar alternatif untuk transisi
+const SECONDARY_IMAGES = [
   'https://images.pexels.com/photos/221540/pexels-photo-221540.jpeg',
   'https://images.pexels.com/photos/415687/pexels-photo-415687.jpeg',
   'https://images.pexels.com/photos/164522/pexels-photo-164522.jpeg',
@@ -33,46 +34,57 @@ const GAMBAR_ALTERNATIF = [
   'https://images.pexels.com/photos/459225/pexels-photo-459225.jpeg',
   'https://images.pexels.com/photos/104827/cat-pet-animal-domestic-104827.jpeg',
   'https://images.pexels.com/photos/213399/pexels-photo-213399.jpeg',
-  'https://images.pexels.com/photos/164522/pexels-photo-164522.jpeg',
+  'https://images.pexels.com/photos/326055/pexels-photo-326055.jpeg',
 ];
 
-const KUMPULAN_GAMBAR = GAMBAR_UTAMA.map((url, idx) => ({
-  id: idx + 1,
-  utama: url,
-  alternatif: GAMBAR_ALTERNATIF[idx],
+// Menggabungkan data gambar dengan struktur yang lebih deskriptif
+const PHOTO_COLLECTION = PRIMARY_IMAGES.map((primaryUrl, index) => ({
+  identifier: `photo_${index + 1}`,
+  primarySource: primaryUrl,
+  alternativeSource: SECONDARY_IMAGES[index],
 }));
 
-const KartuGambar = ({ data }: { data: typeof KUMPULAN_GAMBAR[0] }) => {
-  const [pakaiAlternatif, setPakaiAlternatif] = useState(false);
-  const [skala, setSkala] = useState(1);
+// Komponen untuk menampilkan kartu foto individual
+const PhotoCard = ({ photoData }) => {
+  const [isAlternativeMode, setIsAlternativeMode] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(1);
 
-  const saatDiklik = () => {
-    setPakaiAlternatif(prev => !prev);
-    setSkala(prev => Math.min(prev * 1.2, 2));
+  const handlePhotoTap = () => {
+    setIsAlternativeMode(previousState => !previousState);
+    setZoomLevel(currentZoom => Math.min(currentZoom * 1.2, 2));
   };
 
   return (
-    <TouchableOpacity onPress={saatDiklik} style={gaya.kotak}>
+    <TouchableOpacity onPress={handlePhotoTap} style={styles.cardContainer}>
       <Image
-        source={{ uri: pakaiAlternatif ? data.alternatif : data.utama }}
-        style={[gaya.gambar, { transform: [{ scale: skala }] }]}
+        source={{ 
+          uri: isAlternativeMode ? photoData.alternativeSource : photoData.primarySource 
+        }}
+        style={[styles.photoImage, { transform: [{ scale: zoomLevel }] }]}
         resizeMode="cover"
       />
-      <Text style={gaya.nilai}>Skala: {skala.toFixed(2)}x</Text>
     </TouchableOpacity>
   );
 };
 
-export default function GridFoto() {
-  const ukuran = Dimensions.get('window').width / 3 - 12;
+// Komponen utama aplikasi galeri foto
+export default function PhotoGalleryGrid() {
+  const screenWidth = Dimensions.get('window').width;
+  const itemSize = (screenWidth / 3) - 12;
 
   return (
-    <SafeAreaView style={gaya.latar}>
-      <ScrollView contentContainerStyle={gaya.konten}>
-        <View style={gaya.grid}>
-          {KUMPULAN_GAMBAR.map(item => (
-            <View key={item.id} style={[gaya.item, { width: ukuran, height: ukuran + 24 }]}>
-              <KartuGambar data={item} />
+    <SafeAreaView style={styles.mainContainer}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.gridLayout}>
+          {PHOTO_COLLECTION.map(photoItem => (
+            <View 
+              key={photoItem.identifier} 
+              style={[
+                styles.gridItem, 
+                { width: itemSize, height: itemSize }
+              ]}
+            >
+              <PhotoCard photoData={photoItem} />
             </View>
           ))}
         </View>
@@ -81,39 +93,33 @@ export default function GridFoto() {
   );
 }
 
-const gaya = StyleSheet.create({
-  latar: {
+// Definisi gaya dengan penamaan yang lebih deskriptif
+const styles = StyleSheet.create({
+  mainContainer: {
     flex: 1,
-    backgroundColor: '#101010',
+    backgroundColor: '#1a1a1a',
   },
-  konten: {
+  scrollContent: {
     paddingVertical: 16,
     alignItems: 'center',
   },
-  grid: {
+  gridLayout: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
   },
-  item: {
+  gridItem: {
     margin: 6,
-    borderRadius: 12,
-    overflow: 'hidden',
-    backgroundColor: '#222',
-    alignItems: 'center',
-  },
-  kotak: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  gambar: {
-    width: '100%',
-    height: '85%',
     borderRadius: 10,
+    overflow: 'hidden',
+    backgroundColor: '#2b2b2b',
   },
-  nilai: {
-    color: '#fff',
-    fontSize: 12,
-    marginTop: 4,
+  cardContainer: {
+    flex: 1,
+  },
+  photoImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 10,
   },
 });
