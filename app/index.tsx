@@ -1,63 +1,121 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Image, TouchableOpacity, SafeAreaView, ScrollView, Dimensions, Text, StyleSheet } from 'react-native';
 
-export default function GeoScreen() {
+const SUMBER_FOTO = [
+  'https://images.pexels.com/photos/1546166/pexels-photo-1546166.jpeg',
+  'https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg',
+  'https://images.pexels.com/photos/1029599/pexels-photo-1029599.jpeg',
+  'https://images.pexels.com/photos/672916/pexels-photo-672916.jpeg',
+  'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg',
+  'https://images.pexels.com/photos/2847648/pexels-photo-2847648.jpeg',
+  'https://images.pexels.com/photos/280222/pexels-photo-280222.jpeg',
+  'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg',
+  'https://images.pexels.com/photos/259588/pexels-photo-259588.jpeg',
+];
+
+const KUMPULAN = SUMBER_FOTO.map((tautan, i) => ({
+  kode: i + 1,
+  utama: tautan,
+  fallback: tautan,
+}));
+
+type ObjekGambar = {
+  kode: number;
+  utama: string;
+  fallback: string;
+};
+
+const KartuFoto = ({ data }: { data: ObjekGambar }) => {
+  const [pakaiFallback, setPakaiFallback] = useState(false);
+  const [perbesar, setPerbesar] = useState(1);
+  const [tidakTerload, setTidakTerload] = useState(false);
+
+  const ketikaTekan = () => {
+    if (tidakTerload) return;
+    setPakaiFallback(prev => !prev);
+    setPerbesar(prev => Math.min(prev * 1.15, 2));
+  };
+
+  const aktifUrl = pakaiFallback ? data.fallback : data.utama;
+
   return (
-    <View style={styles.rootBox}>
-      <View style={styles.triShape} />
+    <TouchableOpacity onPress={ketikaTekan} style={gayaKartu.kotak}>
+      {tidakTerload ? (
+        <View style={gayaKartu.blokError}>
+          <Text style={gayaKartu.teks}>Gagal Tampil</Text>
+        </View>
+      ) : (
+        <Image
+          source={{ uri: aktifUrl }}
+          onError={() => setTidakTerload(true)}
+          style={[gayaKartu.img, { transform: [{ scale: perbesar }] }]}
+        />
+      )}
+    </TouchableOpacity>
+  );
+};
 
-      <View style={styles.nameTile}>
-        <Text style={styles.insideText}>NABILA ISMAIL MATTA</Text>
-      </View>
+export default function SusunanFoto() {
+  const layarLebar = Dimensions.get('window').width;
+  const ukuranFoto = layarLebar / 3 - 12;
 
-      <View style={styles.idCapsule}>
-        <Text style={styles.insideText}>105841100722</Text>
-      </View>
-    </View>
+  const potongBaris = (array: ObjekGambar[], awal: number) => array.slice(awal, awal + 3);
+
+  return (
+    <SafeAreaView style={gayaKartu.root}>
+      <ScrollView contentContainerStyle={gayaKartu.scroll}>
+        {[0, 3, 6].map(barisIndex => (
+          <View key={barisIndex} style={gayaKartu.lajur}>
+            {potongBaris(KUMPULAN, barisIndex).map(item => (
+              <View key={item.kode} style={[gayaKartu.peti, { width: ukuranFoto, height: ukuranFoto }]}>
+                <KartuFoto data={item} />
+              </View>
+            ))}
+          </View>
+        ))}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  rootBox: {
+const gayaKartu = StyleSheet.create({
+  root: {
     flex: 1,
-    backgroundColor: '#3A0519',
+    backgroundColor: '#121212',
+  },
+  scroll: {
+    paddingVertical: 18,
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 40,
   },
-  triShape: {
-    width: 0,
-    height: 0,
-    backgroundColor: 'transparent',
-    borderLeftWidth: 70,
-    borderRightWidth: 70,
-    borderBottomWidth: 120,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderBottomColor: '#EF88AD',
-    borderStyle: 'solid',
+  lajur: {
+    flexDirection: 'row',
+    marginBottom: 14,
   },
-  nameTile: {
-    width: 270,
-    height: 70,
-    backgroundColor: '#A53860',
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
+  peti: {
+    marginHorizontal: 6,
   },
-  idCapsule: {
-    width: 270,
-    height: 70,
-    backgroundColor: '#DC8BE0',
-    borderRadius: 35,
+  kotak: {
+    flex: 1,
+    aspectRatio: 1,
+    backgroundColor: '#292929',
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  img: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 12,
+  },
+  blokError: {
+    flex: 1,
+    backgroundColor: '#ffbaba',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    borderRadius: 12,
   },
-  insideText: {
-    fontSize: 18,
+  teks: {
+    color: '#a30000',
     fontWeight: '600',
-    color: '#f5f5f5',
+    fontSize: 13,
   },
 });
