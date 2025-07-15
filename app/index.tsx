@@ -7,6 +7,7 @@ import {
   ScrollView,
   Dimensions,
   StyleSheet,
+  Text,
 } from 'react-native';
 
 const GAMBAR_UTAMA = [
@@ -19,7 +20,7 @@ const GAMBAR_UTAMA = [
   'https://images.pexels.com/photos/280222/pexels-photo-280222.jpeg',
   'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg',
   'https://images.pexels.com/photos/259588/pexels-photo-259588.jpeg',
-  'https://images.pexels.com/photos/463935/pexels-photo-463935.jpeg', // Tambahan ke-10
+  'https://images.pexels.com/photos/463935/pexels-photo-463935.jpeg',
 ];
 
 const GAMBAR_ALTERNATIF = [
@@ -32,7 +33,7 @@ const GAMBAR_ALTERNATIF = [
   'https://images.pexels.com/photos/459225/pexels-photo-459225.jpeg',
   'https://images.pexels.com/photos/104827/cat-pet-animal-domestic-104827.jpeg',
   'https://images.pexels.com/photos/213399/pexels-photo-213399.jpeg',
-  'https://images.pexels.com/photos/164522/pexels-photo-164522.jpeg', // duplikat untuk melengkapi 10
+  'https://images.pexels.com/photos/164522/pexels-photo-164522.jpeg',
 ];
 
 const KUMPULAN_GAMBAR = GAMBAR_UTAMA.map((url, idx) => ({
@@ -57,6 +58,7 @@ const KartuGambar = ({ data }: { data: typeof KUMPULAN_GAMBAR[0] }) => {
         style={[gaya.gambar, { transform: [{ scale: skala }] }]}
         resizeMode="cover"
       />
+      <Text style={gaya.nilai}>Skala: {skala.toFixed(2)}x</Text>
     </TouchableOpacity>
   );
 };
@@ -69,7 +71,7 @@ export default function GridFoto() {
       <ScrollView contentContainerStyle={gaya.konten}>
         <View style={gaya.grid}>
           {KUMPULAN_GAMBAR.map(item => (
-            <View key={item.id} style={[gaya.item, { width: ukuran, height: ukuran }]}>
+            <View key={item.id} style={[gaya.item, { width: ukuran, height: ukuran + 24 }]}>
               <KartuGambar data={item} />
             </View>
           ))}
@@ -82,7 +84,7 @@ export default function GridFoto() {
 const gaya = StyleSheet.create({
   latar: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#101010',
   },
   konten: {
     paddingVertical: 16,
@@ -95,16 +97,23 @@ const gaya = StyleSheet.create({
   },
   item: {
     margin: 6,
-    borderRadius: 10,
+    borderRadius: 12,
     overflow: 'hidden',
-    backgroundColor: '#2b2b2b',
+    backgroundColor: '#222',
+    alignItems: 'center',
   },
   kotak: {
     flex: 1,
+    alignItems: 'center',
   },
   gambar: {
     width: '100%',
-    height: '100%',
+    height: '85%',
     borderRadius: 10,
+  },
+  nilai: {
+    color: '#fff',
+    fontSize: 12,
+    marginTop: 4,
   },
 });
