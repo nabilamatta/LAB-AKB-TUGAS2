@@ -10,170 +10,131 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
-// Koleksi data gambar
-const KOLEKSI = [
-  {
-    kode: 101,
-    utama: 'https://images.pexels.com/photos/1029599/pexels-photo-1029599.jpeg',
-    cadangan: 'https://images.pexels.com/photos/2847648/pexels-photo-2847648.jpeg',
-  },
-  {
-    kode: 102,
-    utama: 'https://images.pexels.com/photos/1546166/pexels-photo-1546166.jpeg',
-    cadangan: 'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg',
-  },
-  {
-    kode: 103,
-    utama: 'https://images.pexels.com/photos/259588/pexels-photo-259588.jpeg',
-    cadangan: 'https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg',
-  },
-  {
-    kode: 104,
-    utama: 'https://images.pexels.com/photos/672916/pexels-photo-672916.jpeg',
-    cadangan: 'https://images.pexels.com/photos/280222/pexels-photo-280222.jpeg',
-  },
-  {
-    kode: 105,
-    utama: 'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg',
-    cadangan: 'https://images.pexels.com/photos/1029599/pexels-photo-1029599.jpeg',
-  },
-  {
-    kode: 106,
-    utama: 'https://images.pexels.com/photos/2847648/pexels-photo-2847648.jpeg',
-    cadangan: 'https://images.pexels.com/photos/672916/pexels-photo-672916.jpeg',
-  },
-  {
-    kode: 107,
-    utama: 'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg',
-    cadangan: 'https://images.pexels.com/photos/1546166/pexels-photo-1546166.jpeg',
-  },
-  {
-    kode: 108,
-    utama: 'https://images.pexels.com/photos/280222/pexels-photo-280222.jpeg',
-    cadangan: 'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg',
-  },
-  {
-    kode: 109,
-    utama: 'https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg',
-    cadangan: 'https://images.pexels.com/photos/259588/pexels-photo-259588.jpeg',
-  },
+// Sumber data gambar
+const KANDANG_GAMBAR = [
+  { kodeUnik: 'A1', fotoUtama: 'https://images.pexels.com/photos/1029599/pexels-photo-1029599.jpeg', fotoGanti: 'https://images.pexels.com/photos/2847648/pexels-photo-2847648.jpeg' },
+  { kodeUnik: 'A2', fotoUtama: 'https://images.pexels.com/photos/1546166/pexels-photo-1546166.jpeg', fotoGanti: 'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg' },
+  { kodeUnik: 'A3', fotoUtama: 'https://images.pexels.com/photos/259588/pexels-photo-259588.jpeg', fotoGanti: 'https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg' },
+  { kodeUnik: 'A4', fotoUtama: 'https://images.pexels.com/photos/672916/pexels-photo-672916.jpeg', fotoGanti: 'https://images.pexels.com/photos/280222/pexels-photo-280222.jpeg' },
+  { kodeUnik: 'A5', fotoUtama: 'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg', fotoGanti: 'https://images.pexels.com/photos/1029599/pexels-photo-1029599.jpeg' },
+  { kodeUnik: 'A6', fotoUtama: 'https://images.pexels.com/photos/2847648/pexels-photo-2847648.jpeg', fotoGanti: 'https://images.pexels.com/photos/672916/pexels-photo-672916.jpeg' },
+  { kodeUnik: 'A7', fotoUtama: 'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg', fotoGanti: 'https://images.pexels.com/photos/1546166/pexels-photo-1546166.jpeg' },
+  { kodeUnik: 'A8', fotoUtama: 'https://images.pexels.com/photos/280222/pexels-photo-280222.jpeg', fotoGanti: 'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg' },
+  { kodeUnik: 'A9', fotoUtama: 'https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg', fotoGanti: 'https://images.pexels.com/photos/259588/pexels-photo-259588.jpeg' },
 ];
 
-// Komponen Kartu Gambar
-const KartuFoto = ({ item }: { item: (typeof KOLEKSI)[0] }) => {
-  const [ganti, setGanti] = useState(false);
-  const [perbesar, setPerbesar] = useState(1);
-  const [rusak, setRusak] = useState(false);
+// Komponen tunggal untuk setiap gambar
+const KomponenGambar = ({ elemen }: { elemen: (typeof KANDANG_GAMBAR)[0] }) => {
+  const [tukar, setTukar] = useState(false);
+  const [zoom, setZoom] = useState(1);
+  const [tidakTampil, setTidakTampil] = useState(false);
 
-  const aksiKlik = () => {
-    if (rusak) return;
-    setGanti(v => !v);
-    setPerbesar(p => (p < 2 ? parseFloat((p * 1.2).toFixed(2)) : 2));
+  const tanganiSentuh = () => {
+    if (tidakTampil) return;
+    setTukar(prev => !prev);
+    setZoom(prev => (prev < 2 ? parseFloat((prev * 1.2).toFixed(2)) : 2));
   };
 
   return (
-    <TouchableOpacity onPress={aksiKlik} style={gaya.petak}>
-      {rusak ? (
-        <View style={gaya.kotakError}>
-          <Text style={gaya.teksRusak}>⚠️ Tidak Tampil</Text>
+    <TouchableOpacity onPress={tanganiSentuh} style={gayaItem.wadahSentuh}>
+      {tidakTampil ? (
+        <View style={gayaItem.tampilanGagal}>
+          <Text style={gayaItem.teksKesalahan}>Gagal Menampilkan</Text>
         </View>
       ) : (
         <Image
-          source={{ uri: ganti ? item.cadangan : item.utama }}
-          onError={() => setRusak(true)}
-          style={[gaya.gbr, { transform: [{ scale: perbesar }] }]}
+          source={{ uri: tukar ? elemen.fotoGanti : elemen.fotoUtama }}
+          onError={() => setTidakTampil(true)}
+          style={[gayaItem.foto, { transform: [{ scale: zoom }] }]}
         />
       )}
     </TouchableOpacity>
   );
 };
 
-// Komponen Identitas & Bentuk
-const KomponenIdentitas = () => (
-  <View style={gaya.areaBentuk}>
-    {/* Segitiga */}
-    <View style={gaya.segi3} />
-    {/* Persegi panjang berisi nama */}
-    <View style={gaya.persegi}>
-      <Text style={gaya.tulisanPusat}>NABILA ISMAIL MATTA</Text>
+// Komponen nama dan ID dalam bentuk
+const InfoMahasiswa = () => (
+  <View style={gayaItem.zonaBentuk}>
+    <View style={gayaItem.segitigaVisual} />
+    <View style={gayaItem.kotakNama}>
+      <Text style={gayaItem.teksTengah}>NABILA ISMAIL MATTA</Text>
     </View>
-    {/* Bentuk pil berisi ID */}
-    <View style={gaya.pil}>
-      <Text style={gaya.tulisanPusat}>105841100722</Text>
+    <View style={gayaItem.kapsulID}>
+      <Text style={gayaItem.teksTengah}>105841100722</Text>
     </View>
   </View>
 );
 
-// Komponen Utama
-export default function GaleriRumah() {
-  const lebar = Dimensions.get('window').width;
-  const ukuran = lebar / 3 - 12;
+// Komponen utama
+export default function GaleriVisual() {
+  const ukuranLayar = Dimensions.get('window').width;
+  const ukuranKartu = ukuranLayar / 3 - 12;
 
-  const renderBaris = (data: typeof KOLEKSI) => (
-    <View style={gaya.baris}>
-      {data.map(item => (
-        <View key={item.kode} style={[gaya.bungkus, { width: ukuran, height: ukuran }]}>
-          <KartuFoto item={item} />
+  const buatBaris = (data: typeof KANDANG_GAMBAR) => (
+    <View style={gayaItem.deretBaris}>
+      {data.map(elemen => (
+        <View key={elemen.kodeUnik} style={[gayaItem.kotakIsi, { width: ukuranKartu, height: ukuranKartu }]}>
+          <KomponenGambar elemen={elemen} />
         </View>
       ))}
     </View>
   );
 
   return (
-    <SafeAreaView style={gaya.latar}>
-      <ScrollView contentContainerStyle={gaya.isiScroll}>
-        <KomponenIdentitas />
-        {renderBaris(KOLEKSI.slice(0, 3))}
-        {renderBaris(KOLEKSI.slice(3, 6))}
-        {renderBaris(KOLEKSI.slice(6, 9))}
+    <SafeAreaView style={gayaItem.tampilanLatar}>
+      <ScrollView contentContainerStyle={gayaItem.kontenGulung}>
+        <InfoMahasiswa />
+        {buatBaris(KANDANG_GAMBAR.slice(0, 3))}
+        {buatBaris(KANDANG_GAMBAR.slice(3, 6))}
+        {buatBaris(KANDANG_GAMBAR.slice(6, 9))}
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-const gaya = StyleSheet.create({
-  latar: {
+// Gaya CSS-in-JS
+const gayaItem = StyleSheet.create({
+  tampilanLatar: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#f4f4f4',
   },
-  isiScroll: {
+  kontenGulung: {
     alignItems: 'center',
     paddingVertical: 20,
   },
-  baris: {
+  deretBaris: {
     flexDirection: 'row',
     marginBottom: 12,
   },
-  bungkus: {
+  kotakIsi: {
     marginHorizontal: 5,
   },
-  petak: {
+  wadahSentuh: {
     flex: 1,
-    backgroundColor: '#dddddd',
+    backgroundColor: '#e0e0e0',
     borderRadius: 10,
     overflow: 'hidden',
     aspectRatio: 1,
   },
-  gbr: {
+  foto: {
     width: '100%',
     height: '100%',
   },
-  kotakError: {
+  tampilanGagal: {
     flex: 1,
-    backgroundColor: '#ffcccc',
+    backgroundColor: '#ffcdd2',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  teksRusak: {
-    color: '#b00020',
+  teksKesalahan: {
+    color: '#d32f2f',
     fontWeight: 'bold',
   },
-  // bentuk tambahan
-  areaBentuk: {
+  zonaBentuk: {
     alignItems: 'center',
     marginBottom: 20,
   },
-  segi3: {
+  segitigaVisual: {
     width: 0,
     height: 0,
     borderLeftWidth: 30,
@@ -181,24 +142,24 @@ const gaya = StyleSheet.create({
     borderBottomWidth: 60,
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
-    borderBottomColor: '#673ab7',
+    borderBottomColor: '#7b1fa2',
     marginBottom: 10,
   },
-  persegi: {
+  kotakNama: {
     width: 250,
     height: 40,
-    backgroundColor: '#0097a7',
+    backgroundColor: '#009688',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 10,
   },
-  pil: {
-    backgroundColor: '#43a047',
+  kapsulID: {
+    backgroundColor: '#4caf50',
     paddingHorizontal: 25,
     paddingVertical: 8,
     borderRadius: 35,
   },
-  tulisanPusat: {
+  teksTengah: {
     color: '#fff',
     fontWeight: 'bold',
   },
