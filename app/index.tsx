@@ -1,22 +1,31 @@
 import React, { useState } from 'react';
-import { View, Image, TouchableOpacity, SafeAreaView, Dimensions, Text, StyleSheet, ScrollView } from 'react-native';
+import {
+  View,
+  Image,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+  Dimensions,
+} from 'react-native';
 
-// Daftar gambar utama dan fallback (berbeda satu sama lain)
-const DATA_GAMBAR = [
+// Gambar utama dan fallback
+const FOTO_DATA = [
   {
     id: 1,
+    utama: 'https://images.pexels.com/photos/1029599/pexels-photo-1029599.jpeg',
+    cadangan: 'https://images.pexels.com/photos/2847648/pexels-photo-2847648.jpeg',
+  },
+  {
+    id: 2,
     utama: 'https://images.pexels.com/photos/1546166/pexels-photo-1546166.jpeg',
     cadangan: 'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg',
   },
   {
-    id: 2,
-    utama: 'https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg',
-    cadangan: 'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg',
-  },
-  {
     id: 3,
-    utama: 'https://images.pexels.com/photos/1029599/pexels-photo-1029599.jpeg',
-    cadangan: 'https://images.pexels.com/photos/2847648/pexels-photo-2847648.jpeg',
+    utama: 'https://images.pexels.com/photos/259588/pexels-photo-259588.jpeg',
+    cadangan: 'https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg',
   },
   {
     id: 4,
@@ -25,133 +34,173 @@ const DATA_GAMBAR = [
   },
   {
     id: 5,
-    utama: 'https://images.pexels.com/photos/259588/pexels-photo-259588.jpeg',
-    cadangan: 'https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg',
+    utama: 'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg',
+    cadangan: 'https://images.pexels.com/photos/1029599/pexels-photo-1029599.jpeg',
   },
   {
     id: 6,
-    utama: 'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg',
-    cadangan: 'https://images.pexels.com/photos/1546166/pexels-photo-1546166.jpeg',
+    utama: 'https://images.pexels.com/photos/2847648/pexels-photo-2847648.jpeg',
+    cadangan: 'https://images.pexels.com/photos/672916/pexels-photo-672916.jpeg',
   },
   {
     id: 7,
-    utama: 'https://images.pexels.com/photos/2847648/pexels-photo-2847648.jpeg',
-    cadangan: 'https://images.pexels.com/photos/1029599/pexels-photo-1029599.jpeg',
+    utama: 'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg',
+    cadangan: 'https://images.pexels.com/photos/1546166/pexels-photo-1546166.jpeg',
   },
   {
     id: 8,
     utama: 'https://images.pexels.com/photos/280222/pexels-photo-280222.jpeg',
-    cadangan: 'https://images.pexels.com/photos/672916/pexels-photo-672916.jpeg',
+    cadangan: 'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg',
   },
   {
     id: 9,
-    utama: 'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg',
+    utama: 'https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg',
     cadangan: 'https://images.pexels.com/photos/259588/pexels-photo-259588.jpeg',
   },
 ];
 
-type JenisGambar = {
+type Gambar = {
   id: number;
   utama: string;
   cadangan: string;
 };
 
-// Komponen gambar yang bisa di-tap untuk ganti dan zoom
-const KartuGambar = ({ data }: { data: JenisGambar }) => {
+const GambarGrid = ({ item }: { item: Gambar }) => {
   const [pakaiCadangan, setPakaiCadangan] = useState(false);
-  const [skala, setSkala] = useState(1);
-  const [gagalMuat, setGagalMuat] = useState(false);
+  const [zoom, setZoom] = useState(1);
+  const [error, setError] = useState(false);
 
-  const saatTekan = () => {
-    if (gagalMuat) return;
+  const tekan = () => {
+    if (error) return;
     setPakaiCadangan(prev => !prev);
-    setSkala(prev => Math.min(prev * 1.2, 2));
+    setZoom(prev => (prev < 2 ? parseFloat((prev * 1.2).toFixed(2)) : 2));
   };
 
-  const gambarDipakai = pakaiCadangan ? data.cadangan : data.utama;
-
   return (
-    <TouchableOpacity onPress={saatTekan} style={gaya.kartu}>
-      {gagalMuat ? (
-        <View style={gaya.errorContainer}>
-          <Text style={gaya.errorText}>Gagal Muat</Text>
+    <TouchableOpacity onPress={tekan} style={styles.kartu}>
+      {error ? (
+        <View style={styles.kotakError}>
+          <Text style={styles.tulisanError}>Gagal</Text>
         </View>
       ) : (
         <Image
-          source={{ uri: gambarDipakai }}
-          onError={() => setGagalMuat(true)}
-          style={[gaya.gambar, { transform: [{ scale: skala }] }]}
+          source={{ uri: pakaiCadangan ? item.cadangan : item.utama }}
+          onError={() => setError(true)}
+          style={[styles.foto, { transform: [{ scale: zoom }] }]}
         />
       )}
     </TouchableOpacity>
   );
 };
 
-// Komponen utama (grid 3x3)
-export default function GaleriGridTiga() {
-  const lebarLayar = Dimensions.get('window').width;
-  const ukuranKotak = lebarLayar / 3 - 10;
+const BentukVisual = () => (
+  <View style={styles.bentukContainer}>
+    <View style={styles.segitiga} />
+    <View style={styles.persegi}>
+      <Text style={styles.textTengah}>NABILA ISMAIL MATTA</Text>
+    </View>
+    <View style={styles.kapsul}>
+      <Text style={styles.textTengah}>105841100722</Text>
+    </View>
+  </View>
+);
 
-  const tampilkanBaris = (data: JenisGambar[]) => (
-    <View style={gaya.baris}>
-      {data.map(item => (
-        <View key={item.id} style={[gaya.wadahGambar, { width: ukuranKotak, height: ukuranKotak }]}>
-          <KartuGambar data={item} />
+export default function AplikasiGaleri() {
+  const ukuran = Dimensions.get('window').width / 3 - 12;
+
+  const buatBaris = (arr: Gambar[]) => (
+    <View style={styles.baris}>
+      {arr.map(item => (
+        <View key={item.id} style={[styles.wadah, { width: ukuran, height: ukuran }]}>
+          <GambarGrid item={item} />
         </View>
       ))}
     </View>
   );
 
   return (
-    <SafeAreaView style={gaya.latar}>
-      <ScrollView contentContainerStyle={gaya.konten}>
-        {tampilkanBaris(DATA_GAMBAR.slice(0, 3))}
-        {tampilkanBaris(DATA_GAMBAR.slice(3, 6))}
-        {tampilkanBaris(DATA_GAMBAR.slice(6, 9))}
+    <SafeAreaView style={styles.latar}>
+      <ScrollView contentContainerStyle={styles.scrollKonten}>
+        <BentukVisual />
+        {buatBaris(FOTO_DATA.slice(0, 3))}
+        {buatBaris(FOTO_DATA.slice(3, 6))}
+        {buatBaris(FOTO_DATA.slice(6, 9))}
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-// Gaya tampilan
-const gaya = StyleSheet.create({
+const styles = StyleSheet.create({
   latar: {
     flex: 1,
-    backgroundColor: '#101010',
+    backgroundColor: '#f8f8f8',
   },
-  konten: {
-    paddingVertical: 18,
+  scrollKonten: {
     alignItems: 'center',
+    paddingVertical: 20,
   },
   baris: {
     flexDirection: 'row',
-    marginBottom: 10,
+    marginBottom: 12,
   },
-  wadahGambar: {
+  wadah: {
     marginHorizontal: 5,
   },
   kartu: {
     flex: 1,
     aspectRatio: 1,
-    borderRadius: 12,
+    backgroundColor: '#ddd',
+    borderRadius: 10,
     overflow: 'hidden',
-    backgroundColor: '#292929',
   },
-  gambar: {
+  foto: {
     width: '100%',
     height: '100%',
-    borderRadius: 12,
   },
-  errorContainer: {
+  kotakError: {
     flex: 1,
-    backgroundColor: '#ffeaea',
+    backgroundColor: '#ffcdd2',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 12,
   },
-  errorText: {
-    color: '#990000',
+  tulisanError: {
+    color: '#b71c1c',
     fontWeight: 'bold',
-    fontSize: 13,
+  },
+  // Tambahan bentuk
+  bentukContainer: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  segitiga: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 30,
+    borderRightWidth: 30,
+    borderBottomWidth: 60,
+    borderStyle: 'solid',
+    backgroundColor: 'transparent',
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderBottomColor: '#5e35b1',
+    marginBottom: 10,
+  },
+  persegi: {
+    width: 240,
+    height: 40,
+    backgroundColor: '#0288d1',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  kapsul: {
+    backgroundColor: '#009688',
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 35,
+  },
+  textTengah: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
