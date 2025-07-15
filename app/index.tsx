@@ -1,121 +1,157 @@
 import React, { useState } from 'react';
-import { View, Image, TouchableOpacity, SafeAreaView, ScrollView, Dimensions, Text, StyleSheet } from 'react-native';
+import { View, Image, TouchableOpacity, SafeAreaView, Dimensions, Text, StyleSheet, ScrollView } from 'react-native';
 
-const SUMBER_FOTO = [
-  'https://images.pexels.com/photos/1546166/pexels-photo-1546166.jpeg',
-  'https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg',
-  'https://images.pexels.com/photos/1029599/pexels-photo-1029599.jpeg',
-  'https://images.pexels.com/photos/672916/pexels-photo-672916.jpeg',
-  'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg',
-  'https://images.pexels.com/photos/2847648/pexels-photo-2847648.jpeg',
-  'https://images.pexels.com/photos/280222/pexels-photo-280222.jpeg',
-  'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg',
-  'https://images.pexels.com/photos/259588/pexels-photo-259588.jpeg',
+// Daftar gambar utama dan fallback (berbeda satu sama lain)
+const DATA_GAMBAR = [
+  {
+    id: 1,
+    utama: 'https://images.pexels.com/photos/1546166/pexels-photo-1546166.jpeg',
+    cadangan: 'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg',
+  },
+  {
+    id: 2,
+    utama: 'https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg',
+    cadangan: 'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg',
+  },
+  {
+    id: 3,
+    utama: 'https://images.pexels.com/photos/1029599/pexels-photo-1029599.jpeg',
+    cadangan: 'https://images.pexels.com/photos/2847648/pexels-photo-2847648.jpeg',
+  },
+  {
+    id: 4,
+    utama: 'https://images.pexels.com/photos/672916/pexels-photo-672916.jpeg',
+    cadangan: 'https://images.pexels.com/photos/280222/pexels-photo-280222.jpeg',
+  },
+  {
+    id: 5,
+    utama: 'https://images.pexels.com/photos/259588/pexels-photo-259588.jpeg',
+    cadangan: 'https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg',
+  },
+  {
+    id: 6,
+    utama: 'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg',
+    cadangan: 'https://images.pexels.com/photos/1546166/pexels-photo-1546166.jpeg',
+  },
+  {
+    id: 7,
+    utama: 'https://images.pexels.com/photos/2847648/pexels-photo-2847648.jpeg',
+    cadangan: 'https://images.pexels.com/photos/1029599/pexels-photo-1029599.jpeg',
+  },
+  {
+    id: 8,
+    utama: 'https://images.pexels.com/photos/280222/pexels-photo-280222.jpeg',
+    cadangan: 'https://images.pexels.com/photos/672916/pexels-photo-672916.jpeg',
+  },
+  {
+    id: 9,
+    utama: 'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg',
+    cadangan: 'https://images.pexels.com/photos/259588/pexels-photo-259588.jpeg',
+  },
 ];
 
-const KUMPULAN = SUMBER_FOTO.map((tautan, i) => ({
-  kode: i + 1,
-  utama: tautan,
-  fallback: tautan,
-}));
-
-type ObjekGambar = {
-  kode: number;
+type JenisGambar = {
+  id: number;
   utama: string;
-  fallback: string;
+  cadangan: string;
 };
 
-const KartuFoto = ({ data }: { data: ObjekGambar }) => {
-  const [pakaiFallback, setPakaiFallback] = useState(false);
-  const [perbesar, setPerbesar] = useState(1);
-  const [tidakTerload, setTidakTerload] = useState(false);
+// Komponen gambar yang bisa di-tap untuk ganti dan zoom
+const KartuGambar = ({ data }: { data: JenisGambar }) => {
+  const [pakaiCadangan, setPakaiCadangan] = useState(false);
+  const [skala, setSkala] = useState(1);
+  const [gagalMuat, setGagalMuat] = useState(false);
 
-  const ketikaTekan = () => {
-    if (tidakTerload) return;
-    setPakaiFallback(prev => !prev);
-    setPerbesar(prev => Math.min(prev * 1.15, 2));
+  const saatTekan = () => {
+    if (gagalMuat) return;
+    setPakaiCadangan(prev => !prev);
+    setSkala(prev => Math.min(prev * 1.2, 2));
   };
 
-  const aktifUrl = pakaiFallback ? data.fallback : data.utama;
+  const gambarDipakai = pakaiCadangan ? data.cadangan : data.utama;
 
   return (
-    <TouchableOpacity onPress={ketikaTekan} style={gayaKartu.kotak}>
-      {tidakTerload ? (
-        <View style={gayaKartu.blokError}>
-          <Text style={gayaKartu.teks}>Gagal Tampil</Text>
+    <TouchableOpacity onPress={saatTekan} style={gaya.kartu}>
+      {gagalMuat ? (
+        <View style={gaya.errorContainer}>
+          <Text style={gaya.errorText}>Gagal Muat</Text>
         </View>
       ) : (
         <Image
-          source={{ uri: aktifUrl }}
-          onError={() => setTidakTerload(true)}
-          style={[gayaKartu.img, { transform: [{ scale: perbesar }] }]}
+          source={{ uri: gambarDipakai }}
+          onError={() => setGagalMuat(true)}
+          style={[gaya.gambar, { transform: [{ scale: skala }] }]}
         />
       )}
     </TouchableOpacity>
   );
 };
 
-export default function SusunanFoto() {
-  const layarLebar = Dimensions.get('window').width;
-  const ukuranFoto = layarLebar / 3 - 12;
+// Komponen utama (grid 3x3)
+export default function GaleriGridTiga() {
+  const lebarLayar = Dimensions.get('window').width;
+  const ukuranKotak = lebarLayar / 3 - 10;
 
-  const potongBaris = (array: ObjekGambar[], awal: number) => array.slice(awal, awal + 3);
+  const tampilkanBaris = (data: JenisGambar[]) => (
+    <View style={gaya.baris}>
+      {data.map(item => (
+        <View key={item.id} style={[gaya.wadahGambar, { width: ukuranKotak, height: ukuranKotak }]}>
+          <KartuGambar data={item} />
+        </View>
+      ))}
+    </View>
+  );
 
   return (
-    <SafeAreaView style={gayaKartu.root}>
-      <ScrollView contentContainerStyle={gayaKartu.scroll}>
-        {[0, 3, 6].map(barisIndex => (
-          <View key={barisIndex} style={gayaKartu.lajur}>
-            {potongBaris(KUMPULAN, barisIndex).map(item => (
-              <View key={item.kode} style={[gayaKartu.peti, { width: ukuranFoto, height: ukuranFoto }]}>
-                <KartuFoto data={item} />
-              </View>
-            ))}
-          </View>
-        ))}
+    <SafeAreaView style={gaya.latar}>
+      <ScrollView contentContainerStyle={gaya.konten}>
+        {tampilkanBaris(DATA_GAMBAR.slice(0, 3))}
+        {tampilkanBaris(DATA_GAMBAR.slice(3, 6))}
+        {tampilkanBaris(DATA_GAMBAR.slice(6, 9))}
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-const gayaKartu = StyleSheet.create({
-  root: {
+// Gaya tampilan
+const gaya = StyleSheet.create({
+  latar: {
     flex: 1,
-    backgroundColor: '#121212',
+    backgroundColor: '#101010',
   },
-  scroll: {
+  konten: {
     paddingVertical: 18,
     alignItems: 'center',
   },
-  lajur: {
+  baris: {
     flexDirection: 'row',
-    marginBottom: 14,
+    marginBottom: 10,
   },
-  peti: {
-    marginHorizontal: 6,
+  wadahGambar: {
+    marginHorizontal: 5,
   },
-  kotak: {
+  kartu: {
     flex: 1,
     aspectRatio: 1,
-    backgroundColor: '#292929',
     borderRadius: 12,
     overflow: 'hidden',
+    backgroundColor: '#292929',
   },
-  img: {
+  gambar: {
     width: '100%',
     height: '100%',
     borderRadius: 12,
   },
-  blokError: {
+  errorContainer: {
     flex: 1,
-    backgroundColor: '#ffbaba',
+    backgroundColor: '#ffeaea',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 12,
   },
-  teks: {
-    color: '#a30000',
-    fontWeight: '600',
+  errorText: {
+    color: '#990000',
+    fontWeight: 'bold',
     fontSize: 13,
   },
 });
