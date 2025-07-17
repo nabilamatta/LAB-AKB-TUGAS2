@@ -9,8 +9,8 @@ import {
   StyleSheet,
 } from 'react-native';
 
-// Daftar 9 gambar utama
-const PRIMARY_IMAGES = [
+// 9 gambar utama
+const IMG_UTAMA = [
   'https://images.pexels.com/photos/1546166/pexels-photo-1546166.jpeg',
   'https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg',
   'https://images.pexels.com/photos/1029599/pexels-photo-1029599.jpeg',
@@ -22,8 +22,8 @@ const PRIMARY_IMAGES = [
   'https://images.pexels.com/photos/259588/pexels-photo-259588.jpeg',
 ];
 
-// Daftar 9 gambar alternatif
-const ALT_IMAGES = [
+// 9 gambar alternatif
+const IMG_PENGGANTI = [
   'https://images.pexels.com/photos/221540/pexels-photo-221540.jpeg',
   'https://images.pexels.com/photos/415687/pexels-photo-415687.jpeg',
   'https://images.pexels.com/photos/164522/pexels-photo-164522.jpeg',
@@ -35,48 +35,49 @@ const ALT_IMAGES = [
   'https://images.pexels.com/photos/213399/pexels-photo-213399.jpeg',
 ];
 
-// Gabungkan menjadi satu objek array
-const IMAGE_DATA = PRIMARY_IMAGES.map((link, index) => ({
-  idUnik: index + 1,
-  utama: link,
-  alternatif: ALT_IMAGES[index],
+// gabung jadi array objek
+const GABUNG_GAMBAR = IMG_UTAMA.map((utama, index) => ({
+  keyID: index,
+  utama: utama,
+  cadangan: IMG_PENGGANTI[index],
 }));
 
-// Komponen kartu individual
-const GambarCard = ({ info }: { info: typeof IMAGE_DATA[0] }) => {
-  const [isAlt, setIsAlt] = useState(false);
-  const [zoom, setZoom] = useState(1);
+// Komponen untuk setiap kartu
+const KartuFoto = ({ data }: { data: typeof GABUNG_GAMBAR[0] }) => {
+  const [pakaiAlt, setPakaiAlt] = useState(false);
+  const [skala, setSkala] = useState(1);
 
-  const handlePress = () => {
-    setIsAlt((prev) => !prev);
-    setZoom((prev) => (prev < 2 ? Math.min(prev * 1.2, 2) : 2));
+  const handleKlik = () => {
+    setPakaiAlt((prev) => !prev);
+    setSkala((prev) => (prev < 2 ? Math.min(prev * 1.2, 2) : 2));
   };
 
   return (
-    <TouchableOpacity onPress={handlePress} style={styleSel.kontainer}>
+    <TouchableOpacity onPress={handleKlik} style={styles.wrapGambar}>
       <Image
-        source={{ uri: isAlt ? info.alternatif : info.utama }}
-        style={[styleSel.gambar, { transform: [{ scale: zoom }] }]}
+        source={{ uri: pakaiAlt ? data.cadangan : data.utama }}
+        style={[styles.gambarPenuh, { transform: [{ scale: skala }] }]}
         resizeMode="cover"
       />
     </TouchableOpacity>
   );
 };
 
-// Komponen utama grid
-export default function GridGambarUtama() {
-  const ukuranSel = Dimensions.get('window').width / 3 - 12;
+// Komponen utama
+export default function GaleriTigaTiga() {
+  const lebarLayar = Dimensions.get('window').width;
+  const ukuranSel = lebarLayar / 3 - 12;
 
   return (
-    <SafeAreaView style={styleSel.latar}>
-      <ScrollView contentContainerStyle={styleSel.wrapper}>
-        <View style={styleSel.gridArea}>
-          {IMAGE_DATA.map((item) => (
+    <SafeAreaView style={styles.rootContainer}>
+      <ScrollView contentContainerStyle={styles.scrollKonten}>
+        <View style={styles.gridKontainer}>
+          {GABUNG_GAMBAR.map((item) => (
             <View
-              key={item.idUnik}
-              style={[styleSel.itemBox, { width: ukuranSel, height: ukuranSel }]}
+              key={item.keyID}
+              style={[styles.bingkaiKotak, { width: ukuranSel, height: ukuranSel }]}
             >
-              <GambarCard info={item} />
+              <KartuFoto data={item} />
             </View>
           ))}
         </View>
@@ -85,33 +86,33 @@ export default function GridGambarUtama() {
   );
 }
 
-// Styling campuran Inggris-Indonesia
-const styleSel = StyleSheet.create({
-  latar: {
+// Style dengan nama unik & bilingual
+const styles = StyleSheet.create({
+  rootContainer: {
     flex: 1,
-    backgroundColor: '#121212',
+    backgroundColor: '#0e0e0e',
   },
-  wrapper: {
-    paddingVertical: 16,
+  scrollKonten: {
+    paddingVertical: 18,
     alignItems: 'center',
   },
-  gridArea: {
+  gridKontainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
   },
-  itemBox: {
+  bingkaiKotak: {
     margin: 6,
-    borderRadius: 10,
-    overflow: 'hidden',
     backgroundColor: '#222',
+    borderRadius: 8,
+    overflow: 'hidden',
   },
-  kontainer: {
+  wrapGambar: {
     flex: 1,
   },
-  gambar: {
+  gambarPenuh: {
     width: '100%',
     height: '100%',
-    borderRadius: 10,
+    borderRadius: 8,
   },
 });
