@@ -9,8 +9,8 @@ import {
   StyleSheet,
 } from 'react-native';
 
-// Daftar gambar utama (main images)
-const MAIN_IMAGES = [
+// Daftar 9 gambar utama
+const PRIMARY_IMAGES = [
   'https://images.pexels.com/photos/1546166/pexels-photo-1546166.jpeg',
   'https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg',
   'https://images.pexels.com/photos/1029599/pexels-photo-1029599.jpeg',
@@ -22,8 +22,8 @@ const MAIN_IMAGES = [
   'https://images.pexels.com/photos/259588/pexels-photo-259588.jpeg',
 ];
 
-// Gambar alternatif untuk tiap gambar utama
-const ALTERNATE_IMAGES = [
+// Daftar 9 gambar alternatif
+const ALT_IMAGES = [
   'https://images.pexels.com/photos/221540/pexels-photo-221540.jpeg',
   'https://images.pexels.com/photos/415687/pexels-photo-415687.jpeg',
   'https://images.pexels.com/photos/164522/pexels-photo-164522.jpeg',
@@ -35,45 +35,48 @@ const ALTERNATE_IMAGES = [
   'https://images.pexels.com/photos/213399/pexels-photo-213399.jpeg',
 ];
 
-// Gabungkan gambar utama dan alternatif menjadi satu array objek
-const IMAGE_COLLECTION = MAIN_IMAGES.map((img, index) => ({
-  id: `img-${index}`,
-  primary: img,
-  alternate: ALTERNATE_IMAGES[index],
+// Gabungkan menjadi satu objek array
+const IMAGE_DATA = PRIMARY_IMAGES.map((link, index) => ({
+  idUnik: index + 1,
+  utama: link,
+  alternatif: ALT_IMAGES[index],
 }));
 
-// Komponen tunggal untuk setiap gambar
-const ImageTile = ({ imageData }) => {
-  const [isAlternate, setIsAlternate] = useState(false);
-  const [scale, setScale] = useState(1);
+// Komponen kartu individual
+const GambarCard = ({ info }: { info: typeof IMAGE_DATA[0] }) => {
+  const [isAlt, setIsAlt] = useState(false);
+  const [zoom, setZoom] = useState(1);
 
   const handlePress = () => {
-    setIsAlternate(prev => !prev);
-    setScale(prev => Math.min(prev * 1.2, 2));
+    setIsAlt((prev) => !prev);
+    setZoom((prev) => (prev < 2 ? Math.min(prev * 1.2, 2) : 2));
   };
 
   return (
-    <TouchableOpacity onPress={handlePress} style={styles.cell}>
+    <TouchableOpacity onPress={handlePress} style={styleSel.kontainer}>
       <Image
-        source={{ uri: isAlternate ? imageData.alternate : imageData.primary }}
-        style={[styles.image, { transform: [{ scale }] }]}
+        source={{ uri: isAlt ? info.alternatif : info.utama }}
+        style={[styleSel.gambar, { transform: [{ scale: zoom }] }]}
         resizeMode="cover"
       />
     </TouchableOpacity>
   );
 };
 
-// Komponen utama
-export default function InteractiveImageGrid() {
-  const cellSize = Dimensions.get('window').width / 3 - 12;
+// Komponen utama grid
+export default function GridGambarUtama() {
+  const ukuranSel = Dimensions.get('window').width / 3 - 12;
 
   return (
-    <SafeAreaView style={styles.background}>
-      <ScrollView contentContainerStyle={styles.wrapper}>
-        <View style={styles.grid}>
-          {IMAGE_COLLECTION.map(item => (
-            <View key={item.id} style={[styles.gridItem, { width: cellSize, height: cellSize }]}>
-              <ImageTile imageData={item} />
+    <SafeAreaView style={styleSel.latar}>
+      <ScrollView contentContainerStyle={styleSel.wrapper}>
+        <View style={styleSel.gridArea}>
+          {IMAGE_DATA.map((item) => (
+            <View
+              key={item.idUnik}
+              style={[styleSel.itemBox, { width: ukuranSel, height: ukuranSel }]}
+            >
+              <GambarCard info={item} />
             </View>
           ))}
         </View>
@@ -82,31 +85,31 @@ export default function InteractiveImageGrid() {
   );
 }
 
-// Gaya komponen
-const styles = StyleSheet.create({
-  background: {
+// Styling campuran Inggris-Indonesia
+const styleSel = StyleSheet.create({
+  latar: {
     flex: 1,
-    backgroundColor: '#1d1d1d',
+    backgroundColor: '#121212',
   },
   wrapper: {
     paddingVertical: 16,
     alignItems: 'center',
   },
-  grid: {
+  gridArea: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
   },
-  gridItem: {
+  itemBox: {
     margin: 6,
     borderRadius: 10,
     overflow: 'hidden',
-    backgroundColor: '#333',
+    backgroundColor: '#222',
   },
-  cell: {
+  kontainer: {
     flex: 1,
   },
-  image: {
+  gambar: {
     width: '100%',
     height: '100%',
     borderRadius: 10,
