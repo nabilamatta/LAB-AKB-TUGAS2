@@ -9,7 +9,8 @@ import {
   StyleSheet,
 } from 'react-native';
 
-const GAMBAR_UTAMA = [
+// Daftar gambar utama (main images)
+const MAIN_IMAGES = [
   'https://images.pexels.com/photos/1546166/pexels-photo-1546166.jpeg',
   'https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg',
   'https://images.pexels.com/photos/1029599/pexels-photo-1029599.jpeg',
@@ -19,10 +20,10 @@ const GAMBAR_UTAMA = [
   'https://images.pexels.com/photos/280222/pexels-photo-280222.jpeg',
   'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg',
   'https://images.pexels.com/photos/259588/pexels-photo-259588.jpeg',
-  'https://images.pexels.com/photos/463935/pexels-photo-463935.jpeg', 
 ];
 
-const GAMBAR_ALTERNATIF = [
+// Gambar alternatif untuk tiap gambar utama
+const ALTERNATE_IMAGES = [
   'https://images.pexels.com/photos/221540/pexels-photo-221540.jpeg',
   'https://images.pexels.com/photos/415687/pexels-photo-415687.jpeg',
   'https://images.pexels.com/photos/164522/pexels-photo-164522.jpeg',
@@ -32,45 +33,47 @@ const GAMBAR_ALTERNATIF = [
   'https://images.pexels.com/photos/459225/pexels-photo-459225.jpeg',
   'https://images.pexels.com/photos/104827/cat-pet-animal-domestic-104827.jpeg',
   'https://images.pexels.com/photos/213399/pexels-photo-213399.jpeg',
-  'https://images.pexels.com/photos/164522/pexels-photo-164522.jpeg', 
 ];
 
-const KUMPULAN_GAMBAR = GAMBAR_UTAMA.map((url, idx) => ({
-  id: idx + 1,
-  utama: url,
-  alternatif: GAMBAR_ALTERNATIF[idx],
+// Gabungkan gambar utama dan alternatif menjadi satu array objek
+const IMAGE_COLLECTION = MAIN_IMAGES.map((img, index) => ({
+  id: `img-${index}`,
+  primary: img,
+  alternate: ALTERNATE_IMAGES[index],
 }));
 
-const KartuGambar = ({ data }: { data: typeof KUMPULAN_GAMBAR[0] }) => {
-  const [pakaiAlternatif, setPakaiAlternatif] = useState(false);
-  const [skala, setSkala] = useState(1);
+// Komponen tunggal untuk setiap gambar
+const ImageTile = ({ imageData }) => {
+  const [isAlternate, setIsAlternate] = useState(false);
+  const [scale, setScale] = useState(1);
 
-  const saatDiklik = () => {
-    setPakaiAlternatif(prev => !prev);
-    setSkala(prev => Math.min(prev * 1.2, 2));
+  const handlePress = () => {
+    setIsAlternate(prev => !prev);
+    setScale(prev => Math.min(prev * 1.2, 2));
   };
 
   return (
-    <TouchableOpacity onPress={saatDiklik} style={gaya.kotak}>
+    <TouchableOpacity onPress={handlePress} style={styles.cell}>
       <Image
-        source={{ uri: pakaiAlternatif ? data.alternatif : data.utama }}
-        style={[gaya.gambar, { transform: [{ scale: skala }] }]}
+        source={{ uri: isAlternate ? imageData.alternate : imageData.primary }}
+        style={[styles.image, { transform: [{ scale }] }]}
         resizeMode="cover"
       />
     </TouchableOpacity>
   );
 };
 
-export default function GridFoto() {
-  const ukuran = Dimensions.get('window').width / 3 - 12;
+// Komponen utama
+export default function InteractiveImageGrid() {
+  const cellSize = Dimensions.get('window').width / 3 - 12;
 
   return (
-    <SafeAreaView style={gaya.latar}>
-      <ScrollView contentContainerStyle={gaya.konten}>
-        <View style={gaya.grid}>
-          {KUMPULAN_GAMBAR.map(item => (
-            <View key={item.id} style={[gaya.item, { width: ukuran, height: ukuran }]}>
-              <KartuGambar data={item} />
+    <SafeAreaView style={styles.background}>
+      <ScrollView contentContainerStyle={styles.wrapper}>
+        <View style={styles.grid}>
+          {IMAGE_COLLECTION.map(item => (
+            <View key={item.id} style={[styles.gridItem, { width: cellSize, height: cellSize }]}>
+              <ImageTile imageData={item} />
             </View>
           ))}
         </View>
@@ -79,12 +82,13 @@ export default function GridFoto() {
   );
 }
 
-const gaya = StyleSheet.create({
-  latar: {
+// Gaya komponen
+const styles = StyleSheet.create({
+  background: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#1d1d1d',
   },
-  konten: {
+  wrapper: {
     paddingVertical: 16,
     alignItems: 'center',
   },
@@ -93,16 +97,16 @@ const gaya = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'center',
   },
-  item: {
+  gridItem: {
     margin: 6,
     borderRadius: 10,
     overflow: 'hidden',
-    backgroundColor: '#2b2b2b',
+    backgroundColor: '#333',
   },
-  kotak: {
+  cell: {
     flex: 1,
   },
-  gambar: {
+  image: {
     width: '100%',
     height: '100%',
     borderRadius: 10,
