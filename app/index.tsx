@@ -9,8 +9,7 @@ import {
   StyleSheet,
 } from 'react-native';
 
-// Daftar 9 gambar utama (main image)
-const MAIN_PICTURES = [
+const MAIN_IMAGES = [
   'https://images.pexels.com/photos/1546166/pexels-photo-1546166.jpeg',
   'https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg',
   'https://images.pexels.com/photos/1029599/pexels-photo-1029599.jpeg',
@@ -22,8 +21,7 @@ const MAIN_PICTURES = [
   'https://images.pexels.com/photos/259588/pexels-photo-259588.jpeg',
 ];
 
-// Daftar 9 gambar pengganti (alternatif)
-const ALT_PICTURES = [
+const ALT_IMAGES = [
   'https://images.pexels.com/photos/221540/pexels-photo-221540.jpeg',
   'https://images.pexels.com/photos/415687/pexels-photo-415687.jpeg',
   'https://images.pexels.com/photos/164522/pexels-photo-164522.jpeg',
@@ -35,54 +33,46 @@ const ALT_PICTURES = [
   'https://images.pexels.com/photos/213399/pexels-photo-213399.jpeg',
 ];
 
-// Gabungkan jadi array objek
-const SEMUA_GAMBAR = MAIN_PICTURES.map((mainUrl, index) => ({
+const IMAGE_LIST = MAIN_IMAGES.map((main, index) => ({
   id: index,
-  original: mainUrl,
-  alternative: ALT_PICTURES[index],
+  main,
+  alt: ALT_IMAGES[index],
 }));
 
-// Komponen gambar individual
-const ItemGambar = ({ gambar }: { gambar: typeof SEMUA_GAMBAR[0] }) => {
-  const [pakaiCadangan, setPakaiCadangan] = useState(false);
-  const [skalaSekarang, setSkalaSekarang] = useState(1);
+const GridImage = ({ item }) => {
+  const [useAlt, setUseAlt] = useState(false);
+  const [scale, setScale] = useState(1);
 
-  const handleKlik = () => {
-    // Toggle gambar utama vs alternatif
-    setPakaiCadangan(prev => !prev);
-
-    // Tambahkan skala bertahap sampai maksimal 2x
-    setSkalaSekarang(prev => {
-      const nextScale = prev * 1.2;
-      return nextScale <= 2 ? nextScale : 2;
+  const handlePress = () => {
+    setUseAlt(!useAlt);
+    setScale((prev) => {
+      const next = prev * 1.2;
+      return next <= 2 ? next : 2;
     });
   };
 
   return (
-    <TouchableOpacity onPress={handleKlik} style={styles.imageTouchWrapper}>
+    <TouchableOpacity onPress={handlePress} style={styles.imageWrapper}>
       <Image
-        source={{ uri: pakaiCadangan ? gambar.alternative : gambar.original }}
-        style={[styles.imageFullSize, { transform: [{ scale: skalaSekarang }] }]}
+        source={{ uri: useAlt ? item.alt : item.main }}
+        style={[styles.image, { transform: [{ scale }] }]}
+        resizeMode="cover"
       />
     </TouchableOpacity>
   );
 };
 
-// Komponen utama grid 3x3
-export default function GridTigaKaliTiga() {
-  const layarLebar = Dimensions.get('window').width;
-  const ukuranSel = layarLebar / 3 - 12;
+export default function App() {
+  const screenWidth = Dimensions.get('window').width;
+  const itemSize = screenWidth / 3 - 12;
 
   return (
-    <SafeAreaView style={styles.kontenRoot}>
-      <ScrollView contentContainerStyle={styles.scrollWrapper}>
-        <View style={styles.gridWrap}>
-          {SEMUA_GAMBAR.map((item) => (
-            <View
-              key={item.id}
-              style={[styles.gridBox, { width: ukuranSel, height: ukuranSel }]}
-            >
-              <ItemGambar gambar={item} />
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollArea}>
+        <View style={styles.grid}>
+          {IMAGE_LIST.map((item) => (
+            <View key={item.id} style={[styles.gridItem, { width: itemSize, height: itemSize }]}>
+              <GridImage item={item} />
             </View>
           ))}
         </View>
@@ -91,31 +81,30 @@ export default function GridTigaKaliTiga() {
   );
 }
 
-// Gaya styling bilingual
 const styles = StyleSheet.create({
-  kontenRoot: {
+  container: {
     flex: 1,
-    backgroundColor: '#121212',
+    backgroundColor: '#111',
   },
-  scrollWrapper: {
-    paddingVertical: 16,
+  scrollArea: {
     alignItems: 'center',
+    paddingVertical: 20,
   },
-  gridWrap: {
+  grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
   },
-  gridBox: {
+  gridItem: {
     margin: 6,
     backgroundColor: '#222',
     borderRadius: 10,
     overflow: 'hidden',
   },
-  imageTouchWrapper: {
+  imageWrapper: {
     flex: 1,
   },
-  imageFullSize: {
+  image: {
     width: '100%',
     height: '100%',
     borderRadius: 10,
