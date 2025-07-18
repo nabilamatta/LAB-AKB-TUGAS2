@@ -1,131 +1,107 @@
-import React, { useState, useMemo, memo, FC } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  FlatList,
-  TouchableOpacity,
-} from 'react-native';
+import React, { useState, useMemo, FC } from 'react';
+import { View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity } from 'react-native';
 
-// --- DATA MAHASISWA DAN LOGIKA ---
+const daftarFontLengkap = [
+  'Roboto-Regular',
+  'Lato-Bold',
+  'Oswald-Regular',
+  'Raleway-Bold',
+  'Montserrat-Regular',
+  'Inter-Variable',
+  'WorkSans-Variable',
+  'Manrope-Variable',
+  'SourceSans3-Variable',
+  'Outfit-Variable',
+];
 
-interface Mahasiswa {
+interface DataMahasiswa {
   id: number;
-  fullName: string;
+  nama: string;
   stambuk: string;
 }
 
-const dataAsliMahasiswa = [
-  { fullName: 'Majeri', stambuk: '105841103622' },
-  { fullName: 'Hamdani', stambuk: '105841103722' },
-  { fullName: 'ALI SULTON S PALILATI', stambuk: '105841102222' },
-  { fullName: 'ABSARMARSAL RIZAL MAHUA', stambuk: '105841101522' },
-  { fullName: 'Syawaluddin', stambuk: '105841101622' },
-  { fullName: 'NUR MILAIN HIDAYAH', stambuk: '105841100822' },
-  { fullName: 'Siti Marwa', stambuk: '105841100122' },
-  { fullName: 'Muliana', stambuk: '105841103822' },
-  { fullName: 'NABILA ISMAIL MATTA', stambuk: '105841100722' },
-  { fullName: 'Andi Citra Ayu Lestari', stambuk: '105841101722' },
+const dataAwal: Omit<DataMahasiswa, 'id'>[] = [
+  { nama: 'Majeri', stambuk: '105841103622' },
+  { nama: 'Hamdani', stambuk: '105841103722' },
+  { nama: 'ALI SULTON S PALILATI', stambuk: '105841102222' },
+  { nama: 'ABSARMARSAL RIZAL MAHUA', stambuk: '105841101522' },
+  { nama: 'Syawaluddin', stambuk: '105841101622' },
+  { nama: 'NUR MILAIN HIDAYAH', stambuk: '105841100822' },
+  { nama: 'Siti Marwa', stambuk: '105841100122' },
+  { nama: 'Muliana', stambuk: '105841103822' },
+  { nama: 'NABILA ISMAIL MATTA', stambuk: '105841100722' },
+  { nama: 'Andi Citra Ayu Lestari', stambuk: '105841101722' },
 ];
 
-const daftarMahasiswa: Mahasiswa[] = Array.from({ length: 130 }, (_, i) => {
+const semuaMahasiswa: DataMahasiswa[] = Array.from({ length: 130 }, (_, i) => {
   const id = i + 1;
-  if (i < dataAsliMahasiswa.length) {
-    return { id, ...dataAsliMahasiswa[i] };
+  if (i < dataAwal.length) {
+    return { id, ...dataAwal[i] };
   }
   return {
     id,
-    fullName: `Mahasiswa Angkatan '22 No. ${id}`,
+    nama: `Mahasiswa Angkatan 22 No. ${id}`,
     stambuk: `10584110${String(id).padStart(3, '0')}22`,
   };
 });
 
-const ambilNamaSekitar = (target: number): Mahasiswa[] => {
-  const hasil: Mahasiswa[] = [];
-  const jumlah = daftarMahasiswa.length;
-  const posisi = target - 1;
+function ambilSepuluhMahasiswa(angkaStambuk: number): DataMahasiswa[] {
+  const indeks = angkaStambuk - 1;
+  const total = semuaMahasiswa.length;
+  const hasil: DataMahasiswa[] = [];
 
   for (let i = 5; i > 0; i--) {
-    const sebelumnya = (posisi - i + jumlah) % jumlah;
-    hasil.push(daftarMahasiswa[sebelumnya]);
+    const idx = (indeks - i + total) % total;
+    hasil.push(semuaMahasiswa[idx]);
   }
   for (let i = 1; i <= 5; i++) {
-    const sesudah = (posisi + i) % jumlah;
-    hasil.push(daftarMahasiswa[sesudah]);
+    const idx = (indeks + i) % total;
+    hasil.push(semuaMahasiswa[idx]);
   }
   return hasil;
-};
-
-// --- DAFTAR FONT ---
-
-const daftarFont = [
-  'Roboto-Regular', 'Lato-Bold', 'Oswald-Regular', 'Raleway-Bold', 'Montserrat-Regular',
-  'Inter-Variable', 'WorkSans-Variable', 'Manrope-Variable', 'SourceSans3-Variable', 'Outfit-Variable',
-];
-
-// --- KOMPONEN KARTU NAMA ---
-
-interface PropertiKartu {
-  name: string;
-  stambuk: string;
-  index: number;
 }
 
-const KartuNama: FC<PropertiKartu> = memo(({ name, stambuk, index }) => {
-  const font = daftarFont[index];
-  const pakaiVariabel = font.includes('Variable');
-  const berat = pakaiVariabel ? `${(index - 4) * 100 + 500}` as any : 'normal';
+const Kartu: FC<{ data: DataMahasiswa; font: string; index: number }> = ({ data, font, index }) => {
+  const isVar = font.includes('Variable');
+  const bobot = isVar ? `${(index - 4) * 100 + 500}` as any : 'normal';
 
   return (
     <View style={gaya.kartu}>
-      <Text style={[gaya.teksNama, { fontFamily: font, fontWeight: berat }]}>
-        {name}
-      </Text>
-      <Text style={gaya.teksStambuk}>{stambuk}</Text>
-      <Text style={gaya.infoFont}>{font} {pakaiVariabel && `(weight: ${berat})`}</Text>
+      <Text style={[gaya.nama, { fontFamily: font, fontWeight: bobot }]}>{data.nama}</Text>
+      <Text style={gaya.stambuk}>{data.stambuk}</Text>
+      <Text style={gaya.font}>{font} {isVar && `(weight: ${bobot})`}</Text>
     </View>
   );
-});
+};
 
-// --- LAYAR UTAMA ---
-
-export default function LayarTugasFont() {
-  const [nomorStambuk, aturStambuk] = useState(10);
-  const dataTampil = useMemo(() => ambilNamaSekitar(nomorStambuk), [nomorStambuk]);
+export default function Beranda() {
+  const [target, setTarget] = useState(10);
+  const tampilkan = useMemo(() => ambilSepuluhMahasiswa(target), [target]);
 
   return (
     <SafeAreaView style={gaya.kontainer}>
-      <View style={{ flex: 1, width: '100%' }}>
-        <Text style={gaya.judul}>Daftar Nama (Stambuk: {nomorStambuk})</Text>
-        <FlatList
-          data={dataTampil}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item, index }) => (
-            <KartuNama
-              name={item.fullName}
-              stambuk={item.stambuk}
-              index={index}
-            />
-          )}
-        />
-      </View>
+      <Text style={gaya.judul}>Nama Mahasiswa Sekitar Stambuk {target}</Text>
+      <FlatList
+        data={tampilkan}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item, index }) => (
+          <Kartu
+            data={item}
+            font={daftarFontLengkap[index]}
+            index={index}
+          />
+        )}
+      />
 
       <View style={gaya.kontrol}>
-        <Text style={gaya.labelKontrol}>Ubah Urutan Stambuk</Text>
-        <View style={gaya.barisTombol}>
-          <TouchableOpacity
-            style={gaya.tombol}
-            onPress={() => aturStambuk(s => (s > 1 ? s - 1 : 130))}
-          >
-            <Text style={gaya.teksTombol}>-</Text>
+        <Text style={gaya.label}>Atur Stambuk</Text>
+        <View style={gaya.baris}>
+          <TouchableOpacity onPress={() => setTarget(t => (t > 1 ? t - 1 : 130))} style={gaya.tombol}>
+            <Text style={gaya.tombolTeks}>-</Text>
           </TouchableOpacity>
-          <Text style={gaya.tampilanStambuk}>{nomorStambuk}</Text>
-          <TouchableOpacity
-            style={gaya.tombol}
-            onPress={() => aturStambuk(s => (s < 130 ? s + 1 : 1))}
-          >
-            <Text style={gaya.teksTombol}>+</Text>
+          <Text style={gaya.target}>{target}</Text>
+          <TouchableOpacity onPress={() => setTarget(t => (t < 130 ? t + 1 : 1))} style={gaya.tombol}>
+            <Text style={gaya.tombolTeks}>+</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -133,80 +109,73 @@ export default function LayarTugasFont() {
   );
 }
 
-// --- GAYA / STYLE ---
-
 const gaya = StyleSheet.create({
   kontainer: {
     flex: 1,
-    backgroundColor: '#121212',
-    alignItems: 'center',
+    backgroundColor: '#111',
     paddingTop: 50,
+    paddingHorizontal: 16,
   },
   judul: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: 'white',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  kontrol: {
-    width: '100%',
-    paddingVertical: 15,
-    alignItems: 'center',
-    backgroundColor: '#1c1c1e',
-    borderTopWidth: 1,
-    borderTopColor: '#3A3A3C',
-  },
-  labelKontrol: {
-    color: 'white',
-    marginBottom: 15,
-    fontSize: 16,
-  },
-  barisTombol: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  tombol: {
-    backgroundColor: '#0A84FF',
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginHorizontal: 20,
-  },
-  teksTombol: {
-    color: 'white',
-    fontSize: 28,
-    fontWeight: 'bold',
-  },
-  tampilanStambuk: {
-    color: 'white',
     fontSize: 22,
-    fontWeight: '600',
-    width: 60,
+    color: '#fff',
+    fontWeight: 'bold',
     textAlign: 'center',
+    marginBottom: 20,
   },
   kartu: {
-    backgroundColor: '#2c2c2e',
+    backgroundColor: '#2a2a2a',
+    padding: 14,
     borderRadius: 8,
-    padding: 15,
-    marginHorizontal: 20,
-    marginVertical: 6,
+    marginBottom: 10,
   },
-  teksNama: {
-    color: 'white',
+  nama: {
     fontSize: 18,
+    color: 'white',
   },
-  teksStambuk: {
-    color: '#b0b0b0',
-    fontSize: 14,
+  stambuk: {
+    color: '#bbb',
     marginTop: 4,
+    fontSize: 14,
   },
-  infoFont: {
-    color: '#8e8e93',
+  font: {
+    color: '#888',
     fontSize: 10,
-    marginTop: 8,
+    marginTop: 6,
+  },
+  kontrol: {
+    paddingVertical: 16,
+    borderTopColor: '#333',
+    borderTopWidth: 1,
+    alignItems: 'center',
+  },
+  label: {
+    color: 'white',
+    marginBottom: 12,
+    fontSize: 15,
+  },
+  baris: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  tombol: {
+    backgroundColor: '#007AFF',
+    borderRadius: 24,
+    width: 48,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 16,
+  },
+  tombolTeks: {
+    color: 'white',
+    fontSize: 26,
+    fontWeight: 'bold',
+  },
+  target: {
+    fontSize: 20,
+    color: 'white',
+    width: 60,
+    textAlign: 'center',
   },
 });
