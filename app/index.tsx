@@ -20,6 +20,7 @@ const visualElements: VisualElement[] = [
   { symbol: 'flower-outline', title: 'Botanik' },
   { symbol: 'diamond-outline', title: 'Premium' },
   { symbol: 'gift-outline', title: 'Hadiah' },
+  { symbol: 'telescope-outline', title: 'Eksplorasi' },
 ];
 
 const IconDisplayComponent: React.FC = () => {
