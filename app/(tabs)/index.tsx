@@ -1,8 +1,8 @@
 import React from 'react';
 import { Text, View, Image, ScrollView } from 'react-native';
-import { styles } from '../styles'; // Mengimpor style dari file terpisah
+import { styles } from '../styles';
 
-export default function BerandaScreen() {
+export default function HomeScreen() {
   return (
     <ScrollView style={styles.wrapperUtama}>
       <View style={styles.kontenTengah}>
