@@ -1,44 +1,15 @@
-import React from 'react';
 import { Tabs } from 'expo-router';
-import { FontAwesome } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 
-// Definisikan tipe untuk props tabBarIcon
-type TabBarIconProps = {
-  color: string;
-};
-
-export default function TabLayout() {
+export default function TabsLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: '#1E90FF',
-        tabBarInactiveTintColor: 'gray',
-        tabBarStyle: {
-          backgroundColor: '#FFFFFF',
-        },
-        headerStyle: {
-          backgroundColor: '#1E90FF',
-        },
-        headerTintColor: '#fff',
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
-      }}>
+    <Tabs screenOptions={{ tabBarActiveTintColor: '#0066cc' }}>
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }: TabBarIconProps) => (
-            <FontAwesome size={28} name="home" color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="about"
-        options={{
-          title: 'About',
-          tabBarIcon: ({ color }: TabBarIconProps) => (
-            <FontAwesome size={28} name="info-circle" color={color} />
+          title: 'Beranda',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home-outline" size={size} color={color} />
           ),
         }}
       />
@@ -46,8 +17,17 @@ export default function TabLayout() {
         name="profil"
         options={{
           title: 'Profil',
-          tabBarIcon: ({ color }: TabBarIconProps) => (
-            <FontAwesome size={28} name="user" color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="about"
+        options={{
+          title: 'Tentang',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="information-circle-outline" size={size} color={color} />
           ),
         }}
       />
