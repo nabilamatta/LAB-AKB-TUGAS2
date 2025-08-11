@@ -1,28 +1,32 @@
 import React from 'react';
 import { Text, View, Image, ScrollView } from 'react-native';
-import { styles } from '../styles'; // Impor gaya dari file terpisah
+import { styles } from '../styles'; // Mengimpor style dari file terpisah
 
-export default function HomeScreen() {
+export default function BerandaScreen() {
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.content}>
+    <ScrollView style={styles.wrapperUtama}>
+      <View style={styles.kontenTengah}>
         <Image
           source={require('../../assets/images/unismuh-logo.png')}
-          style={styles.logo}
+          style={styles.gambarLogo}
           resizeMode="contain"
         />
-        <Text style={styles.title}>Universitas Muhammadiyah Makassar</Text>
-        <Text style={styles.subtitle}>Kampus Biru, Pusat Pencerahan</Text>
-        <Text style={styles.description}>
-          Universitas Muhammadiyah (Unismuh) Makassar adalah salah satu perguruan tinggi swasta terkemuka di Indonesia Timur. Berlokasi di kota Makassar, Unismuh berkomitmen untuk menyelenggarakan pendidikan yang unggul, islami, dan mencerahkan.
+        <Text style={styles.judulHalaman}>Universitas Muhammadiyah Makassar</Text>
+        <Text style={styles.subJudul}>Kampus Biru, Inspirasi dan Pencerahan</Text>
+        <Text style={styles.teksDeskripsi}>
+          Universitas Muhammadiyah Makassar merupakan salah satu perguruan tinggi swasta ternama di kawasan Indonesia Timur. 
+          Berada di Kota Makassar, kampus ini berkomitmen memberikan pendidikan berkualitas, berlandaskan nilai-nilai Islam, 
+          dan berperan aktif dalam mencerdaskan kehidupan bangsa.
         </Text>
-        <View style={styles.infoBox}>
-          <Text style={styles.infoTitle}>Lokasi</Text>
-          <Text style={styles.infoText}>Jl. Sultan Alauddin No. 259, Makassar, Sulawesi Selatan, Indonesia.</Text>
+        <View style={styles.kotakInformasi}>
+          <Text style={styles.judulInfo}>Alamat</Text>
+          <Text style={styles.isiInfo}>Jl. Sultan Alauddin No. 259, Kota Makassar, Sulawesi Selatan, Indonesia.</Text>
         </View>
-         <View style={styles.infoBox}>
-          <Text style={styles.infoTitle}>Visi</Text>
-          <Text style={styles.infoText}>Menjadi perguruan tinggi Islam terkemuka, unggul, terpercaya, dan mandiri pada tahun 2025.</Text>
+        <View style={styles.kotakInformasi}>
+          <Text style={styles.judulInfo}>Visi</Text>
+          <Text style={styles.isiInfo}>
+            Menjadi universitas Islam yang unggul, terpercaya, inovatif, dan mandiri dalam pengembangan ilmu pengetahuan dan teknologi pada tahun 2025.
+          </Text>
         </View>
       </View>
     </ScrollView>
